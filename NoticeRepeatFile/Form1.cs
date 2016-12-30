@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Dapper;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -122,7 +123,9 @@ namespace NoticeRepeatFile
                 sr.Close();
             }
             dg1.DataSource = listFile;
-            
+            insertData(listFile);
+
+
         }
         private void insertData(List<fileData> fd)
         {
@@ -151,6 +154,33 @@ namespace NoticeRepeatFile
         {
             //replaceFile();
             testRegex();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            //string txtKeyWord = txtKey.Text;
+            //string[] keyword = txtKeyWord.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+            //foreach (var a in keyword)
+            //{
+            //listMsg.Items.Add(a);
+            string a = "";
+                var result = searchKeyword(a);
+                if (result.Result.Count() > 0)
+                    dg1.DataSource = result.Result.ToList();
+
+            //}
+        }
+
+        private async Task<IEnumerable<fileData>> searchKeyword(string keyword)
+        {
+            keyword = "%" + keyword + "%";
+
+            using (var conn = new SQLiteConnection("Data source = fileLibary.db"))
+            {
+                conn.Open();
+                var result = await conn.QueryAsync<fileData>(@"select * from movie where fileName like @keyword;", new { keyword });
+                return result;
+            }
         }
     }
 }
