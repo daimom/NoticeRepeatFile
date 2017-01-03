@@ -18,7 +18,9 @@ namespace NoticeRepeatFile
     {
         private SQLiteConnection sqlite_connect;
         private SQLiteCommand sqlite_cmd;
-        FileSystemWatcher _watch = new FileSystemWatcher();
+        FileSystemWatcher _watchTorrent = new FileSystemWatcher();
+        FileSystemWatcher _watchAvi = new FileSystemWatcher();
+
         public Form1()
         {
             InitializeComponent();
@@ -49,12 +51,16 @@ namespace NoticeRepeatFile
                 //INTEGER PRIMARY KEY AUTOINCREMENT=>auto increase index
                 sqlite_cmd.ExecuteNonQuery(); //using behind every write cmd
             }
-            _watch.Path = @"J:\torrent";
-            _watch.Filter = "*.torrent";
-            _watch.EnableRaisingEvents = true;
+            //todo 設定欄位的文字方塊
+            _watchTorrent.Path = @"J:\torrent";
+            _watchTorrent.Filter = "*.torrent";
+            _watchTorrent.EnableRaisingEvents = true;
             //觸發事件
-            _watch.Created += new FileSystemEventHandler(watch_Created);
-
+            _watchTorrent.Created += new FileSystemEventHandler(watch_Created);
+            
+            _watchAvi.Path = @"J:\...";            
+            _watchAvi.EnableRaisingEvents = true;
+            _watchAvi.Created += new FileSystemEventHandler(folder_created);
             //指定使用的容器
             this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);           
             //建立NotifyIcon
@@ -62,6 +68,18 @@ namespace NoticeRepeatFile
             this.notifyIcon1.Visible = true;
             this.notifyIcon1.Text = "監控中....";
             this.notifyIcon1.MouseDoubleClick += doubleClick;
+        }
+        private string[] filters = new string[] { ".avi", ".mp4" };
+        private void folder_created(object sender, FileSystemEventArgs e)
+        {
+            if(filters.Contains(Path.GetExtension(e.FullPath)))
+            {
+                string fileName = getShortName(e.Name);
+
+
+            }
+            
+
         }
 
         private void doubleClick(object sender, MouseEventArgs e)
