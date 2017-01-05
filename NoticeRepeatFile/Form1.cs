@@ -51,16 +51,7 @@ namespace NoticeRepeatFile
                 //INTEGER PRIMARY KEY AUTOINCREMENT=>auto increase index
                 sqlite_cmd.ExecuteNonQuery(); //using behind every write cmd
             }
-            //todo 設定欄位的文字方塊
-            _watchTorrent.Path = @"J:\torrent";
-            _watchTorrent.Filter = "*.torrent";
-            _watchTorrent.EnableRaisingEvents = true;
-            //觸發事件
-            _watchTorrent.Created += new FileSystemEventHandler(watch_Created);
-            
-            _watchAvi.Path = @"J:\...";            
-            _watchAvi.EnableRaisingEvents = true;
-            _watchAvi.Created += new FileSystemEventHandler(folder_created);
+           
             //指定使用的容器
             this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);           
             //建立NotifyIcon
@@ -69,18 +60,7 @@ namespace NoticeRepeatFile
             this.notifyIcon1.Text = "監控中....";
             this.notifyIcon1.MouseDoubleClick += doubleClick;
         }
-        private string[] filters = new string[] { ".avi", ".mp4" };
-        private void folder_created(object sender, FileSystemEventArgs e)
-        {
-            if(filters.Contains(Path.GetExtension(e.FullPath)))
-            {
-                string fileName = getShortName(e.Name);
 
-
-            }
-            
-
-        }
 
         private void doubleClick(object sender, MouseEventArgs e)
         {
@@ -95,7 +75,11 @@ namespace NoticeRepeatFile
                 this.notifyIcon1.Visible = true;
             }
         }
-        
+        /// <summary>
+        /// 即時監控torrent
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void watch_Created(object sender, FileSystemEventArgs e)
         {
             List<fileData> listFile = new List<fileData>();
@@ -113,8 +97,7 @@ namespace NoticeRepeatFile
                 {
                     var oneFile = result.Result.ToList();
                     listFile.AddRange(oneFile);
-                }
-                    
+                }                    
             }
             if(listFile.Count> 0)
             {                
@@ -129,7 +112,30 @@ namespace NoticeRepeatFile
             //dg1.DataSource = listFile;
 
         }
-        
+        private string[] filters = new string[] { ".avi", ".mp4" };
+        /// <summary>
+        /// 即時監控avi資料夾，新增至資料庫
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void folder_created(object sender, FileSystemEventArgs e)
+        {
+            if (filters.Contains(Path.GetExtension(e.FullPath)))
+            {
+                List<fileData> listFile = new List<fileData>();
+                string fullName = e.Name.Replace(".!ut", "");
+                fileData fd = new fileData()
+                {
+                    sourceName = fullName,
+                    fileName = getShortName(fullName),
+                    fileTime = DateTime.Now.ToString(),
+                    location = e.FullPath
+                };
+                listFile.Add(fd);
+                insertData(listFile);
+            }
+        }
+
         private delegate void UpdateFormCallBack();
         private void UpdateForm()
         {
@@ -177,21 +183,54 @@ namespace NoticeRepeatFile
 
             //}
         }
-        #endregion
-        public void replaceFile()
+        /// <summary>
+        /// 監控torrent
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void button3_Click(object sender, EventArgs e)
         {
-            List<fileData> listFile = new List<fileData>();
             FolderBrowserDialog openFolderDialog = new FolderBrowserDialog();
 
             if (openFolderDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 var folderPath = System.IO.Path.Combine(openFolderDialog.SelectedPath);
                 txtPath.Text = folderPath;
-                DirectoryInfo di = new DirectoryInfo(folderPath);
-                //copy file
-                searchFile("*.avi",di,ref listFile);
-                searchFile("*.mp4",di,ref listFile);                
+                _watchTorrent.Path = txtPath.Text;
+                _watchTorrent.Filter = "*.torrent";
+                _watchTorrent.EnableRaisingEvents = true;
+                _watchTorrent.Created += new FileSystemEventHandler(watch_Created);
             }
+        }
+        /// <summary>
+        /// 監控影片
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void button4_Click(object sender, EventArgs e)
+        {
+            FolderBrowserDialog openFolderDialog = new FolderBrowserDialog();
+
+            if (openFolderDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                var folderPath = System.IO.Path.Combine(openFolderDialog.SelectedPath);
+                txtAvi.Text = folderPath;
+
+                _watchAvi.Path =txtAvi.Text;
+                _watchAvi.EnableRaisingEvents = true;
+                _watchAvi.Created += new FileSystemEventHandler(folder_created);
+            }
+        }
+        #endregion
+        public void replaceFile()
+        {
+            List<fileData> listFile = new List<fileData>();            
+            var folderPath = txtAvi.Text;
+            txtPath.Text = folderPath;
+            DirectoryInfo di = new DirectoryInfo(folderPath);
+            //copy file
+            searchFile("*.avi",di,ref listFile);
+            searchFile("*.mp4",di,ref listFile);
             dg1.DataSource = listFile;
             insertData(listFile);
         }
@@ -355,8 +394,9 @@ namespace NoticeRepeatFile
 
 
 
+
         #endregion
 
- 
+     
     }
 }
