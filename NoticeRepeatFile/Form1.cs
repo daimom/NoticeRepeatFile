@@ -59,6 +59,10 @@ namespace NoticeRepeatFile
             this.notifyIcon1.Visible = true;
             this.notifyIcon1.Text = "監控中....";
             this.notifyIcon1.MouseDoubleClick += doubleClick;
+            if (!txtPath.Text.Contains("Please Select"))
+                TorrentWatch(txtPath.Text);
+            if (!txtAvi.Text.Contains("Please Select"))
+                AviWatch(txtAvi.Text);
         }
 
 
@@ -120,7 +124,9 @@ namespace NoticeRepeatFile
         /// <param name="e"></param>
         private void folder_created(object sender, FileSystemEventArgs e)
         {
-            if (filters.Contains(Path.GetExtension(e.FullPath)))
+            //todo 當有單一檔案要手動加入時的動作
+            ///先排除!ut
+            if (filters.Contains(Path.GetExtension(Path.GetFileNameWithoutExtension(e.FullPath))))
             {
                 List<fileData> listFile = new List<fileData>();
                 string fullName = e.Name.Replace(".!ut", "");
@@ -135,7 +141,10 @@ namespace NoticeRepeatFile
                 insertData(listFile);
             }
         }
-
+        private void button5_Click(object sender, EventArgs e)
+        {
+            Properties.Settings.Default.Save();
+        }
         private delegate void UpdateFormCallBack();
         private void UpdateForm()
         {
@@ -180,7 +189,8 @@ namespace NoticeRepeatFile
             var result = searchKeyword(a);
             if (result.Result.Count() > 0)
                 dg1.DataSource = result.Result.ToList();
-
+            else
+                msg("查無資料");
             //}
         }
         /// <summary>
@@ -195,11 +205,8 @@ namespace NoticeRepeatFile
             if (openFolderDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 var folderPath = System.IO.Path.Combine(openFolderDialog.SelectedPath);
-                txtPath.Text = folderPath;
-                _watchTorrent.Path = txtPath.Text;
-                _watchTorrent.Filter = "*.torrent";
-                _watchTorrent.EnableRaisingEvents = true;
-                _watchTorrent.Created += new FileSystemEventHandler(watch_Created);
+                TorrentWatch(folderPath);
+                txtPath.Text = folderPath;                
             }
         }
         /// <summary>
@@ -214,14 +221,29 @@ namespace NoticeRepeatFile
             if (openFolderDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 var folderPath = System.IO.Path.Combine(openFolderDialog.SelectedPath);
+                AviWatch(folderPath);
                 txtAvi.Text = folderPath;
-
-                _watchAvi.Path =txtAvi.Text;
-                _watchAvi.EnableRaisingEvents = true;
-                _watchAvi.Created += new FileSystemEventHandler(folder_created);
             }
         }
         #endregion
+        public void TorrentWatch(string folderPath)
+        {
+            _watchTorrent.Path = folderPath;
+            _watchTorrent.Filter = "*.torrent";
+            _watchTorrent.EnableRaisingEvents = true;
+            _watchTorrent.IncludeSubdirectories = true;
+            _watchTorrent.Created += new FileSystemEventHandler(watch_Created);
+            msg("torrent資料夾監視開始..");
+        }
+        public void AviWatch(string folderPath)
+        {
+            _watchAvi.Path = folderPath;
+            _watchAvi.Filter = "*.*";
+            _watchAvi.EnableRaisingEvents = true;
+            _watchAvi.IncludeSubdirectories = true;
+            _watchAvi.Created += new FileSystemEventHandler(folder_created);
+            msg("Avi資料夾監視開始..");
+        }
         public void replaceFile()
         {
             List<fileData> listFile = new List<fileData>();            
@@ -307,9 +329,9 @@ namespace NoticeRepeatFile
         }
         private void msg(string message)
         {
-            txtMsg.Text += Environment.NewLine + message;
-            txtMsg.SelectionStart = txtMsg.Text.Length;
-            txtMsg.ScrollToCaret();
+            txtMsg.Text = message;
+            //txtMsg.SelectionStart = txtMsg.Text.Length;
+            //txtMsg.ScrollToCaret();
         }
        
 
@@ -395,8 +417,9 @@ namespace NoticeRepeatFile
 
 
 
+
         #endregion
 
-     
+
     }
 }

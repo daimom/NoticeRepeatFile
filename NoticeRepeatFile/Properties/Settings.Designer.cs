@@ -25,7 +25,7 @@ namespace NoticeRepeatFile.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Please Select")]
         public string torrentFolder {
             get {
                 return ((string)(this["torrentFolder"]));
@@ -37,7 +37,7 @@ namespace NoticeRepeatFile.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Please Select")]
         public string AviFolder {
             get {
                 return ((string)(this["AviFolder"]));
