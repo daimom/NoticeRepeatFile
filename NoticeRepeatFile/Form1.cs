@@ -109,10 +109,11 @@ namespace NoticeRepeatFile
                 notifyIcon1.BalloonTipText = "警告！！有檔案重複。";
                 notifyIcon1.BalloonTipTitle = "警告！！";
                 notifyIcon1.ShowBalloonTip(5000);                
-                UpdateForm();                
+                UpdateForm();
+                UpdateUI(listFile);                
             }
                 
-            UpdateUI(listFile);
+            
             //dg1.DataSource = listFile;
 
         }
@@ -125,6 +126,8 @@ namespace NoticeRepeatFile
         private void folder_created(object sender, FileSystemEventArgs e)
         {
             //todo 當有單一檔案要手動加入時的動作
+            //todo 也要檢查種子是否有一樣的檔名
+            //todo jpg 跟 jpeg 列入紀錄
             ///先排除!ut
             if (filters.Contains(Path.GetExtension(Path.GetFileNameWithoutExtension(e.FullPath))))
             {
