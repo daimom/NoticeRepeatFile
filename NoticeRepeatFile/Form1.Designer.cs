@@ -62,12 +62,14 @@
             this.dg1.RowTemplate.Height = 24;
             this.dg1.Size = new System.Drawing.Size(612, 215);
             this.dg1.TabIndex = 3;
+            this.dg1.RowPostPaint += new System.Windows.Forms.DataGridViewRowPostPaintEventHandler(this.dg1_RowPostPaint);
             // 
             // txtMsg
             // 
             this.txtMsg.Location = new System.Drawing.Point(12, 304);
+            this.txtMsg.Multiline = true;
             this.txtMsg.Name = "txtMsg";
-            this.txtMsg.Size = new System.Drawing.Size(612, 22);
+            this.txtMsg.Size = new System.Drawing.Size(612, 62);
             this.txtMsg.TabIndex = 4;
             // 
             // button2
@@ -150,13 +152,14 @@
             this.button6.TabIndex = 11;
             this.button6.Text = "button6";
             this.button6.UseVisualStyleBackColor = true;
+            this.button6.Visible = false;
             this.button6.Click += new System.EventHandler(this.button6_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(689, 343);
+            this.ClientSize = new System.Drawing.Size(689, 378);
             this.Controls.Add(this.button6);
             this.Controls.Add(this.button5);
             this.Controls.Add(this.button4);

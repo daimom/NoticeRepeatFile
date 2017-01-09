@@ -151,6 +151,7 @@ namespace NoticeRepeatFile
                 };
                 listFile.Add(fd);
                 insertData(listFile);
+                msg(string.Format("已插入一筆資料：{0}",fd.fileName));
             }
         }
         private void button5_Click(object sender, EventArgs e)
@@ -424,9 +425,9 @@ namespace NoticeRepeatFile
         }
         private void msg(string message)
         {
-            txtMsg.Text = message;
-            //txtMsg.SelectionStart = txtMsg.Text.Length;
-            //txtMsg.ScrollToCaret();
+            txtMsg.Text += Environment.NewLine+ message;
+            txtMsg.SelectionStart = txtMsg.Text.Length;
+            txtMsg.ScrollToCaret();
         }
        
 
@@ -518,6 +519,14 @@ namespace NoticeRepeatFile
         private void button6_Click(object sender, EventArgs e)
         {
             testRegex();
+        }
+
+        private void dg1_RowPostPaint(object sender, DataGridViewRowPostPaintEventArgs e)
+        {
+            dg1.Columns[0].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            dg1.Columns[1].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            dg1.Columns[2].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            dg1.Columns[3].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
         }
     }
     public static class EnumerableExtender
