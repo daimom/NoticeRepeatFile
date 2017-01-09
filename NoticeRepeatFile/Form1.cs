@@ -14,20 +14,7 @@ using System.Windows.Forms;
 
 namespace NoticeRepeatFile
 {
-    public static class EnumerableExtender
-    {
-        public static IEnumerable<TSource> DistinctBy<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector)
-        {
-            HashSet<TKey> seenKeys = new HashSet<TKey>();
-            foreach (TSource element in source)
-            {                
-                if (seenKeys.Add(keySelector(element)))
-                {
-                    yield return element;
-                }
-            }
-        }
-    }
+    
     public partial class Form1 : Form
     {
         private SQLiteConnection sqlite_connect;
@@ -213,8 +200,13 @@ namespace NoticeRepeatFile
             //listMsg.Items.Add(a);
             string a = txtKeyword.Text;
             var result = searchKeyword(a);
-            if (result.Result.Count() > 0)
+            var count = result.Result.Count();
+            if (count > 0)
+            {
                 dg1.DataSource = result.Result.ToList();
+                msg(string.Format("查詢：{0}筆",count));
+            }
+                
             else
                 msg("查無資料");
             //}
@@ -274,14 +266,24 @@ namespace NoticeRepeatFile
         {
             List<fileData> listFile = new List<fileData>();            
             var folderPath = txtAvi.Text;
-            txtPath.Text = folderPath;
+            txtAvi.Text = folderPath;
             DirectoryInfo di = new DirectoryInfo(folderPath);
             //copy file
+            msg("建立中....");
+            System.Threading.Thread.Sleep(300);
+            Application.DoEvents();
             searchFile("*.avi", di, ref listFile);
-            searchFile("*.mp4",di,ref listFile);
-            dg1.DataSource = listFile;
-            insertData(listFile);
+            searchFile("*.mp4", di, ref listFile);
+            searchFile("*.jpg", di, ref listFile);
+            var distinctList = listFile.DistinctBy(p => p.fileName).ToList();
+            dg1.DataSource = distinctList;
+            insertData(distinctList);
         }
+        /// <summary>
+        /// 檢查torrent是否重複
+        /// </summary>
+        /// <param name="checkFile"></param>
+        /// <returns></returns>
         private string getTorrentFile(string checkFile)
         {
             List<string> listTorrent = new List<string>();
@@ -305,17 +307,53 @@ namespace NoticeRepeatFile
         {
             foreach (var fi in di.GetFiles(extendName, SearchOption.AllDirectories))
             {
+
                 fileData fd = new fileData()
                 {
-                    sourceName = fi.Name,
-                    fileName = getShortName(fi.Name),
+                    sourceName = fi.Name,                    
                     fileTime = fi.CreationTime.ToString(),
                     location = fi.FullName
                 };
-                listFile.Add(fd);
+                if (extendName == "*.jpg")
+                    fd.fileName = getJpgName(fi.Name);
+                else
+                    fd.fileName = getShortName(fi.Name);
+                if(!string.IsNullOrWhiteSpace(fd.fileName))
+                    listFile.Add(fd);
                 //msg(fi.FullName);
                 //msg(fi.Name);
             }
+        }
+        private string checkRegexStr(string input)
+        {
+            //string urlPattern = @"^.+(\.net|\.com|\.cc|\.co|\.tv)[^a-zA-Z0-9]?"; //網址
+            string urlPattern = @"\w+\.(net|com|cc|co|tv)";
+            string ipPattern = @"(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)";    //IP
+            if (regexReplaceStr(ref input, urlPattern)) // 先判斷是否有網址?網址取代:繼續
+                return input;
+            else if (regexReplaceStr(ref input, ipPattern)) // 先判斷是否有ip?ip取代:繼續
+                return input;
+
+            return input;
+
+        }
+        /// <summary>
+        /// 找到input 並取代為empty
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="urlPattern"></param>
+        /// <returns></returns>
+        private Boolean regexReplaceStr(ref string input, string urlPattern)
+        {
+            Regex urlrgx = new Regex(urlPattern, RegexOptions.IgnoreCase);
+            MatchCollection urlmatches = urlrgx.Matches(input);
+            if (urlmatches.Count > 0)
+            {
+                foreach (Match match in urlmatches)
+                    input = input.Replace(match.Value, "");
+                return true;
+            }
+            return false;
         }
         /// <summary>
         /// 取得短名字
@@ -348,7 +386,25 @@ namespace NoticeRepeatFile
             }   
             return input;
         }
+        private string getJpgName(string fileName)
+        {
+            string pattern = @"[a-zA-Z]{2,}\d{3,}";               
 
+            var input = checkRegexStr(fileName);
+            //取檔案名
+
+            Regex rgx = new Regex(pattern, RegexOptions.IgnoreCase);
+            MatchCollection matches = rgx.Matches(input.Replace("-", ""));
+            if (matches.Count > 0)
+            {
+                
+                //todo 手動排除big,拉成設定檔
+                foreach (Match match in matches)
+                    return match.Value.Replace("big","");
+
+            }
+            return "";            
+        }
         private void insertData(List<fileData> fd)
         {
             using (sqlite_connect = new SQLiteConnection("Data source = fileLibary.db"))
@@ -386,37 +442,7 @@ namespace NoticeRepeatFile
             }
         }
         #region 測試
-        private string checkRegexStr(string input)
-        {
-            //string urlPattern = @"^.+(\.net|\.com|\.cc|\.co|\.tv)[^a-zA-Z0-9]?"; //網址
-            string urlPattern = @"\w+\.(net|com|cc|co|tv)";
-            string ipPattern = @"(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)";    //IP
-            if (regexReplaceStr(ref input, urlPattern)) // 先判斷是否有網址?網址取代:繼續
-                return input;
-            else if (regexReplaceStr(ref input, ipPattern)) // 先判斷是否有ip?ip取代:繼續
-                return input;
-
-            return input;
-
-        }
-        /// <summary>
-        /// 找到input 並取代為empty
-        /// </summary>
-        /// <param name="input"></param>
-        /// <param name="urlPattern"></param>
-        /// <returns></returns>
-        private Boolean regexReplaceStr(ref string input,string urlPattern)
-        {
-            Regex urlrgx = new Regex(urlPattern, RegexOptions.IgnoreCase);
-            MatchCollection urlmatches = urlrgx.Matches(input);
-            if (urlmatches.Count > 0)
-            {
-                foreach (Match match in urlmatches)
-                    input = input.Replace(match.Value, "");
-                return true;
-            }
-            return false;
-        }
+        
         /// <summary>
         /// 文字檔測試用
         /// </summary>
@@ -492,6 +518,20 @@ namespace NoticeRepeatFile
         private void button6_Click(object sender, EventArgs e)
         {
             testRegex();
+        }
+    }
+    public static class EnumerableExtender
+    {
+        public static IEnumerable<TSource> DistinctBy<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector)
+        {
+            HashSet<TKey> seenKeys = new HashSet<TKey>();
+            foreach (TSource element in source)
+            {
+                if (seenKeys.Add(keySelector(element)))
+                {
+                    yield return element;
+                }
+            }
         }
     }
 }
