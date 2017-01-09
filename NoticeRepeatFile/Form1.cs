@@ -14,6 +14,20 @@ using System.Windows.Forms;
 
 namespace NoticeRepeatFile
 {
+    public static class EnumerableExtender
+    {
+        public static IEnumerable<TSource> DistinctBy<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector)
+        {
+            HashSet<TKey> seenKeys = new HashSet<TKey>();
+            foreach (TSource element in source)
+            {                
+                if (seenKeys.Add(keySelector(element)))
+                {
+                    yield return element;
+                }
+            }
+        }
+    }
     public partial class Form1 : Form
     {
         private SQLiteConnection sqlite_connect;
@@ -32,8 +46,9 @@ namespace NoticeRepeatFile
             public string location { get; set; }
             public string fileTime { get; set; }
         }
+
         #region 控制項事件
-   
+
         private void Form1_Load(object sender, EventArgs e)
         {
             if (!File.Exists(Application.StartupPath + @"\fileLibary.db"))
@@ -96,12 +111,20 @@ namespace NoticeRepeatFile
                 string txtKey = name;
                 if (name.IndexOf(".torrent") >= 0)
                     txtKey = name.Replace(".torrent", "");
-                var result = searchKeyword(txtKey);
+                var result = searchKeyword(txtKey); //檢查資料庫
                 if (result.Result.Count() > 0)
                 {
                     var oneFile = result.Result.ToList();
                     listFile.AddRange(oneFile);
-                }                    
+                }
+                var torrentResult = getTorrentFile(name);   //檢查種子
+                if (string.IsNullOrWhiteSpace(torrentResult) == false)
+                {
+                    listFile.Add(new fileData {
+                        sourceName = txtPath.Text +" 有重複的種子名稱",
+                        fileName = torrentResult
+                    });
+                }
             }
             if(listFile.Count> 0)
             {                
@@ -126,7 +149,6 @@ namespace NoticeRepeatFile
         private void folder_created(object sender, FileSystemEventArgs e)
         {
             //todo 當有單一檔案要手動加入時的動作
-            //todo 也要檢查種子是否有一樣的檔名
             //todo jpg 跟 jpeg 列入紀錄
             ///先排除!ut
             if (filters.Contains(Path.GetExtension(Path.GetFileNameWithoutExtension(e.FullPath))))
@@ -162,6 +184,7 @@ namespace NoticeRepeatFile
                 this.WindowState = FormWindowState.Normal;
             }
         }
+        
         private delegate void UpdateUICallBack(List<fileData> listFile);
         private void UpdateUI(List<fileData>  listFile)
         {
@@ -254,10 +277,23 @@ namespace NoticeRepeatFile
             txtPath.Text = folderPath;
             DirectoryInfo di = new DirectoryInfo(folderPath);
             //copy file
-            searchFile("*.avi",di,ref listFile);
+            searchFile("*.avi", di, ref listFile);
             searchFile("*.mp4",di,ref listFile);
             dg1.DataSource = listFile;
             insertData(listFile);
+        }
+        private string getTorrentFile(string checkFile)
+        {
+            List<string> listTorrent = new List<string>();
+            var folderPath = txtPath.Text;
+            DirectoryInfo di = new DirectoryInfo(folderPath);
+            foreach(var fi in di.GetFiles("*.torrent",SearchOption.TopDirectoryOnly))
+            {
+                var torrentName = fi.Name;
+                if (torrentName.Contains(checkFile))
+                    return torrentName;                
+            }
+            return "";
         }
         /// <summary>
         /// 擷取檔案列表
@@ -350,6 +386,37 @@ namespace NoticeRepeatFile
             }
         }
         #region 測試
+        private string checkRegexStr(string input)
+        {
+            //string urlPattern = @"^.+(\.net|\.com|\.cc|\.co|\.tv)[^a-zA-Z0-9]?"; //網址
+            string urlPattern = @"\w+\.(net|com|cc|co|tv)";
+            string ipPattern = @"(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)";    //IP
+            if (regexReplaceStr(ref input, urlPattern)) // 先判斷是否有網址?網址取代:繼續
+                return input;
+            else if (regexReplaceStr(ref input, ipPattern)) // 先判斷是否有ip?ip取代:繼續
+                return input;
+
+            return input;
+
+        }
+        /// <summary>
+        /// 找到input 並取代為empty
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="urlPattern"></param>
+        /// <returns></returns>
+        private Boolean regexReplaceStr(ref string input,string urlPattern)
+        {
+            Regex urlrgx = new Regex(urlPattern, RegexOptions.IgnoreCase);
+            MatchCollection urlmatches = urlrgx.Matches(input);
+            if (urlmatches.Count > 0)
+            {
+                foreach (Match match in urlmatches)
+                    input = input.Replace(match.Value, "");
+                return true;
+            }
+            return false;
+        }
         /// <summary>
         /// 文字檔測試用
         /// </summary>
@@ -363,23 +430,18 @@ namespace NoticeRepeatFile
                 var fileName = Path.Combine(openFileDg.FileName);
                 StreamReader sr = new StreamReader(fileName);
                 string input;
-                string urlPattern = @"^.+(.net|.com|.cc|.co)[^a-zA-Z0-9]?"; //網址
+                
                 string pattern = @"[a-zA-Z]{2,}\d{3,}";
                 while (sr.Peek() >= 0)
                 {
-                    input = sr.ReadLine();
-                    // 先判斷是否有網址?網址取代:繼續
-                    Regex urlrgx = new Regex(urlPattern, RegexOptions.IgnoreCase);
-                    MatchCollection urlmatches = urlrgx.Matches(input);
-                    if (urlmatches.Count > 0)
-                    {
-                        foreach (Match match in urlmatches)
-                            input = input.Replace(match.Value, "");
-                    }
-
+                    var filepath = sr.ReadLine();
+                    input = Path.GetFileName(filepath);
+                    
+                    input = checkRegexStr(input);
                     //取檔案名
+
                     Regex rgx = new Regex(pattern, RegexOptions.IgnoreCase);
-                    MatchCollection matches = rgx.Matches(input);
+                    MatchCollection matches = rgx.Matches(input.Replace("-", ""));
                     if (matches.Count > 0)
                     {
                         //Console.WriteLine("{0} ({1} matches):", input, matches.Count);
@@ -387,10 +449,10 @@ namespace NoticeRepeatFile
                         {
                             fileData fd = new fileData()
                             {
-                                sourceName = input,
+                                sourceName = Path.GetFileName(input),
                                 fileName = match.Value,
                                 fileTime = "2016/12/30",
-                                location = fileName
+                                location = filepath
                             };
                             listFile.Add(fd);
                         }
@@ -399,10 +461,10 @@ namespace NoticeRepeatFile
                     {
                         fileData fd = new fileData()
                         {
-                            sourceName = input,
-                            fileName = input,
+                            sourceName = Path.GetFileName(input),
+                            fileName = Path.GetFileName(input),
                             fileTime = "2016/12/30",
-                            location = fileName
+                            location = filepath
                         };
                         listFile.Add(fd);
                     }
@@ -410,11 +472,15 @@ namespace NoticeRepeatFile
                 }
                 sr.Close();
             }
-            dg1.DataSource = listFile;
-            insertData(listFile);
+            var distinctList = listFile.DistinctBy(p =>  p.fileName );
+            dg1.DataSource = distinctList.ToList();
+            msg("總筆數：" + distinctList.Count());
+            //dg1.DataSource = listFile.DistinctBy(p=>new { p.fileName });
+            //insertData(listFile);
 
 
         }
+ 
 
 
 
@@ -423,6 +489,9 @@ namespace NoticeRepeatFile
 
         #endregion
 
-
+        private void button6_Click(object sender, EventArgs e)
+        {
+            testRegex();
+        }
     }
 }

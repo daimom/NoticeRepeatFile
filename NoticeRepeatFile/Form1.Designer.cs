@@ -40,6 +40,7 @@
             this.button5 = new System.Windows.Forms.Button();
             this.txtAvi = new System.Windows.Forms.TextBox();
             this.txtPath = new System.Windows.Forms.TextBox();
+            this.button6 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dg1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -141,11 +142,22 @@
             this.txtPath.TabIndex = 2;
             this.txtPath.Text = global::NoticeRepeatFile.Properties.Settings.Default.torrentFolder;
             // 
+            // button6
+            // 
+            this.button6.Location = new System.Drawing.Point(559, 39);
+            this.button6.Name = "button6";
+            this.button6.Size = new System.Drawing.Size(75, 23);
+            this.button6.TabIndex = 11;
+            this.button6.Text = "button6";
+            this.button6.UseVisualStyleBackColor = true;
+            this.button6.Click += new System.EventHandler(this.button6_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(689, 343);
+            this.Controls.Add(this.button6);
             this.Controls.Add(this.button5);
             this.Controls.Add(this.button4);
             this.Controls.Add(this.txtAvi);
@@ -179,6 +191,7 @@
         private System.Windows.Forms.TextBox txtAvi;
         private System.Windows.Forms.Button button4;
         private System.Windows.Forms.Button button5;
+        private System.Windows.Forms.Button button6;
     }
 }
 
