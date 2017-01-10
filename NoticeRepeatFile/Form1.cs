@@ -398,10 +398,22 @@ namespace NoticeRepeatFile
             {
 
                 //todo 手動排除big,拉成設定檔
-                                
+                string value="";
                 foreach (Match match in matches)
-                    return match.Value.Replace("big","");
+                    value = match.Value;
 
+                if (!string.IsNullOrWhiteSpace(value))
+                {
+                    
+                    value = value.Replace("big", "");                    
+                    if (value.Length >= 8)
+                    {
+                        string doubleZero = "00";
+                        rgx = new Regex(doubleZero);
+                        return rgx.Replace(value, "",1);
+                    }
+                    return value;                        
+                }
             }
             return "";            
         }
@@ -457,43 +469,50 @@ namespace NoticeRepeatFile
                 StreamReader sr = new StreamReader(fileName);
                 string input;
                 
-                string pattern = @"[a-zA-Z]{2,}\d{3,}";
+                //string pattern = @"[a-zA-Z]{2,}\d{3,}";
                 while (sr.Peek() >= 0)
                 {
                     var filepath = sr.ReadLine();
                     input = Path.GetFileName(filepath);
                     
                     input = checkRegexStr(input);
-                    //取檔案名
-
-                    Regex rgx = new Regex(pattern, RegexOptions.IgnoreCase);
-                    MatchCollection matches = rgx.Matches(input.Replace("-", ""));
-                    if (matches.Count > 0)
+                                        
+                    fileData fd = new fileData()
                     {
-                        //Console.WriteLine("{0} ({1} matches):", input, matches.Count);
-                        foreach (Match match in matches)
-                        {
-                            fileData fd = new fileData()
-                            {
-                                sourceName = Path.GetFileName(input),
-                                fileName = match.Value,
-                                fileTime = "2016/12/30",
-                                location = filepath
-                            };
-                            listFile.Add(fd);
-                        }
-                    }
-                    else
-                    {
-                        fileData fd = new fileData()
-                        {
-                            sourceName = Path.GetFileName(input),
-                            fileName = Path.GetFileName(input),
-                            fileTime = "2016/12/30",
-                            location = filepath
-                        };
-                        listFile.Add(fd);
-                    }
+                        sourceName = Path.GetFileName(input),
+                        fileName = getJpgName(input),
+                        fileTime = "2016/12/30",
+                        location = filepath
+                    };
+                    listFile.Add(fd);
+                    //Regex rgx = new Regex(pattern, RegexOptions.IgnoreCase);
+                    //MatchCollection matches = rgx.Matches(input.Replace("-", ""));
+                    //if (matches.Count > 0)
+                    //{
+                    //    //Console.WriteLine("{0} ({1} matches):", input, matches.Count);
+                    //    foreach (Match match in matches)
+                    //    {
+                    //        fileData fd = new fileData()
+                    //        {
+                    //            sourceName = Path.GetFileName(input),
+                    //            fileName = match.Value,
+                    //            fileTime = "2016/12/30",
+                    //            location = filepath
+                    //        };
+                    //        listFile.Add(fd);
+                    //    }
+                    //}
+                    //else
+                    //{
+                    //    fileData fd = new fileData()
+                    //    {
+                    //        sourceName = Path.GetFileName(input),
+                    //        fileName = Path.GetFileName(input),
+                    //        fileTime = "2016/12/30",
+                    //        location = filepath
+                    //    };
+                    //    listFile.Add(fd);
+                    //}
 
                 }
                 sr.Close();
