@@ -170,6 +170,7 @@ namespace NoticeRepeatFile
             {
                 this.Show();
                 this.WindowState = FormWindowState.Normal;
+                this.Activate();
             }
         }
         
