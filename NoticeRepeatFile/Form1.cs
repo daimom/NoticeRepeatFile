@@ -135,13 +135,11 @@ namespace NoticeRepeatFile
         /// <param name="e"></param>
         private void folder_created(object sender, FileSystemEventArgs e)
         {
-            //todo 當有單一檔案要手動加入時的動作
-            //todo jpg 跟 jpeg 列入紀錄
-            ///先排除!ut
+
             if (filters.Contains(Path.GetExtension(Path.GetFileNameWithoutExtension(e.FullPath))))
             {
                 List<fileData> listFile = new List<fileData>();
-                string fullName = e.Name.Replace(".!ut", "");
+                string fullName = e.Name.Replace(".!ut", "");               ///先排除!ut
                 fileData fd = new fileData()
                 {
                     sourceName = fullName,
@@ -190,7 +188,6 @@ namespace NoticeRepeatFile
         private void button1_Click(object sender, EventArgs e)
         {
             replaceFile();
-            //testRegex();
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -399,8 +396,9 @@ namespace NoticeRepeatFile
             MatchCollection matches = rgx.Matches(input.Replace("-", ""));
             if (matches.Count > 0)
             {
-                
+
                 //todo 手動排除big,拉成設定檔
+                                
                 foreach (Match match in matches)
                     return match.Value.Replace("big","");
 

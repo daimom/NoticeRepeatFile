@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.button1 = new System.Windows.Forms.Button();
             this.dg1 = new System.Windows.Forms.DataGridView();
             this.txtMsg = new System.Windows.Forms.TextBox();
@@ -60,7 +61,7 @@
             this.dg1.Location = new System.Drawing.Point(12, 83);
             this.dg1.Name = "dg1";
             this.dg1.RowTemplate.Height = 24;
-            this.dg1.Size = new System.Drawing.Size(612, 215);
+            this.dg1.Size = new System.Drawing.Size(622, 215);
             this.dg1.TabIndex = 3;
             this.dg1.RowPostPaint += new System.Windows.Forms.DataGridViewRowPostPaintEventHandler(this.dg1_RowPostPaint);
             // 
@@ -69,7 +70,8 @@
             this.txtMsg.Location = new System.Drawing.Point(12, 304);
             this.txtMsg.Multiline = true;
             this.txtMsg.Name = "txtMsg";
-            this.txtMsg.Size = new System.Drawing.Size(612, 62);
+            this.txtMsg.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.txtMsg.Size = new System.Drawing.Size(622, 62);
             this.txtMsg.TabIndex = 4;
             // 
             // button2
@@ -160,7 +162,8 @@
             this.AcceptButton = this.button2;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(689, 378);
+            this.BackColor = System.Drawing.SystemColors.InactiveCaption;
+            this.ClientSize = new System.Drawing.Size(646, 378);
             this.Controls.Add(this.button6);
             this.Controls.Add(this.button5);
             this.Controls.Add(this.button4);
@@ -172,8 +175,10 @@
             this.Controls.Add(this.dg1);
             this.Controls.Add(this.txtPath);
             this.Controls.Add(this.button1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
-            this.Text = "Form1";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.Text = "搖桿驅動程式監控";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.SizeChanged += new System.EventHandler(this.Form1_SizeChanged);
             ((System.ComponentModel.ISupportInitialize)(this.dg1)).EndInit();
