@@ -104,11 +104,12 @@ namespace NoticeRepeatFile
                     var oneFile = result.Result.ToList();
                     listFile.AddRange(oneFile);
                 }
-                var torrentResult = getTorrentFile(name);   //檢查種子
-                if (string.IsNullOrWhiteSpace(torrentResult) == false)
+                var torrentResult = getTorrentFile(txtKey);   //檢查種子
+                if (string.IsNullOrWhiteSpace(torrentResult)==false)
                 {
+                    
                     listFile.Add(new fileData {
-                        sourceName = txtPath.Text +" 有重複的種子名稱",
+                        sourceName = txtPath.Text ,
                         fileName = torrentResult
                     });
                 }
@@ -288,6 +289,7 @@ namespace NoticeRepeatFile
             List<string> listTorrent = new List<string>();
             var folderPath = txtPath.Text;
             DirectoryInfo di = new DirectoryInfo(folderPath);
+            //todo 當新增後，才搜尋會找到已下載下來的檔案
             foreach(var fi in di.GetFiles("*.torrent",SearchOption.TopDirectoryOnly))
             {
                 var torrentName = fi.Name;
