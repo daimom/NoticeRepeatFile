@@ -91,33 +91,38 @@ namespace NoticeRepeatFile
             List<fileData> listFile = new List<fileData>();
             var dirInfo = new DirectoryInfo(e.FullPath.ToString());
             var fileName = dirInfo.Name;
-            string txtKeyWord = fileName;
-            string[] keyword = txtKeyWord.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+            var fileTime = dirInfo.CreationTime;
+            string[] keyword = fileName.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
             foreach (var name in keyword)
             {
                 string txtKey = name;
                 if (name.IndexOf(".torrent") >= 0)
                     txtKey = name.Replace(".torrent", "");
+                if (name.IndexOf(".") >= 0)
+                    txtKey = name.Replace(".", "");
                 var result = searchKeyword(txtKey); //檢查資料庫
                 if (result.Result.Count() > 0)
                 {
                     var oneFile = result.Result.ToList();
                     listFile.AddRange(oneFile);
                 }
-                var torrentResult = getTorrentFile(txtKey);   //檢查種子
-                if (string.IsNullOrWhiteSpace(torrentResult)==false)
+                var torrentResult = getTorrentFile(txtKey,fileTime);   //檢查種子
+                if (torrentResult.Count > 0 )
                 {
-                    
-                    listFile.Add(new fileData {
-                        sourceName = txtPath.Text ,
-                        fileName = torrentResult
-                    });
+                    foreach(var files in torrentResult)
+                    {
+                        listFile.Add(new fileData
+                        {
+                            sourceName = txtPath.Text,
+                            fileName = files
+                        });
+                    }                                        
                 }
             }
             if(listFile.Count> 0)
             {                
                 notifyIcon1.Visible = true;
-                notifyIcon1.BalloonTipText = "警告！！有檔案重複。";
+                notifyIcon1.BalloonTipText = "警告！！有檔案重複。有檔案重複。有檔案重複。有檔案重複。有檔案重複。";
                 notifyIcon1.BalloonTipTitle = "警告！！";
                 notifyIcon1.ShowBalloonTip(5000);                
                 UpdateForm();
@@ -282,21 +287,23 @@ namespace NoticeRepeatFile
         /// <summary>
         /// 檢查torrent是否重複
         /// </summary>
-        /// <param name="checkFile"></param>
+        /// <param name="checkFile">檔案名稱</param>
+        /// <param name="fileTime">檔案建立時間</param>
         /// <returns></returns>
-        private string getTorrentFile(string checkFile)
+        private List<string> getTorrentFile(string checkFile,DateTime fileTime)
         {
+
             List<string> listTorrent = new List<string>();
             var folderPath = txtPath.Text;
             DirectoryInfo di = new DirectoryInfo(folderPath);
-            //todo 當新增後，才搜尋會找到已下載下來的檔案
+            
             foreach(var fi in di.GetFiles("*.torrent",SearchOption.TopDirectoryOnly))
             {
                 var torrentName = fi.Name;
-                if (torrentName.Contains(checkFile))
-                    return torrentName;                
+                if (torrentName.Contains(checkFile) && fileTime != fi.CreationTime)
+                    listTorrent.Add(torrentName);
             }
-            return "";
+            return listTorrent;
         }
         /// <summary>
         /// 擷取檔案列表
