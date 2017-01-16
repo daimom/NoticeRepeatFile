@@ -208,13 +208,14 @@ namespace NoticeRepeatFile
             var count = result.Result.Count();
             if (count > 0)
             {
-                dg1.DataSource = result.Result.ToList();
+                dg1.DataSource = result.Result.OrderBy(p => p.fileName).ToList();
                 msg(string.Format("查詢：{0}筆",count));
             }
                 
             else
                 msg("查無資料");
             //}
+            
         }
         /// <summary>
         /// 監控torrent
