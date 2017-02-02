@@ -213,7 +213,7 @@ namespace NoticeRepeatFile
             }
                 
             else
-                msg("查無資料");
+                msg(string.Format("查無資料--{0}",DateTime.Now.ToString()));
             //}
             
         }
@@ -555,6 +555,17 @@ namespace NoticeRepeatFile
             dg1.Columns[1].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
             dg1.Columns[2].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
             dg1.Columns[3].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+        }
+
+        private void dg1_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            int row = e.RowIndex;
+            int col = e.ColumnIndex;
+            if(row>=0 && col >=0)
+            {
+                msg(string.Format("value:{0}",dg1.Rows[row].Cells[col].ToString()));
+            }
+
         }
     }
     public static class EnumerableExtender

@@ -63,6 +63,7 @@
             this.dg1.RowTemplate.Height = 24;
             this.dg1.Size = new System.Drawing.Size(622, 215);
             this.dg1.TabIndex = 3;
+            this.dg1.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dg1_CellDoubleClick);
             this.dg1.RowPostPaint += new System.Windows.Forms.DataGridViewRowPostPaintEventHandler(this.dg1_RowPostPaint);
             // 
             // txtMsg
