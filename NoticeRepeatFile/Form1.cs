@@ -300,8 +300,8 @@ namespace NoticeRepeatFile
             
             foreach(var fi in di.GetFiles("*.torrent",SearchOption.TopDirectoryOnly))
             {
-                var torrentName = fi.Name;
-                if (torrentName.Contains(checkFile) && fileTime != fi.CreationTime)
+                var torrentName = fi.Name.ToUpper();
+                if (torrentName.Contains(checkFile.ToUpper()) && fileTime != fi.CreationTime)
                     listTorrent.Add(torrentName);
             }
             return listTorrent;
