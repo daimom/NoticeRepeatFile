@@ -203,7 +203,7 @@ namespace NoticeRepeatFile
             //foreach (var a in keyword)
             //{
             //listMsg.Items.Add(a);
-            string a = txtKeyword.Text;
+            string a = txtKeyword.Text.Trim();
             var result = searchKeyword(a);
             var count = result.Result.Count();
             if (count > 0)
