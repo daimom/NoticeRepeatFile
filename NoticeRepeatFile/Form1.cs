@@ -193,6 +193,19 @@ namespace NoticeRepeatFile
         }
         private void button1_Click(object sender, EventArgs e)
         {
+            using (var conn = new SQLiteConnection("Data source = fileLibary.db"))
+            {
+                conn.Open();
+                var result = conn.Query<int>(@"select count(*) from movie;");
+                if (result.First<int>()>0)
+                {
+                    DialogResult Result = MessageBox.Show("資料庫內已有資料，是否確定匯入", "警告", MessageBoxButtons.YesNo);
+                    if (Result == System.Windows.Forms.DialogResult.No)
+                    {
+                        return;
+                    }
+                }
+            }
             replaceFile();
         }
 
@@ -249,6 +262,31 @@ namespace NoticeRepeatFile
                 txtAvi.Text = folderPath;
             }
         }
+
+        //刪除重複的資料
+        private void btnRefresh_Click(object sender, EventArgs e)
+        {
+            using (sqlite_connect = new SQLiteConnection("Data source = fileLibary.db"))
+            {
+                //建立資料庫連線                
+                sqlite_connect.Open();// Open
+                sqlite_cmd = sqlite_connect.CreateCommand();
+                SQLiteTransaction sqlite_trans = sqlite_connect.BeginTransaction();
+                sqlite_cmd.CommandText = @"delete from movie where sn not in (select min(sn)
+                                    from movie
+                                    where fileName in (SELECT distinct filename FROM movie)
+                                    group by filename)";
+                sqlite_cmd.ExecuteNonQuery();
+                //foreach (var row in fd)
+                //{
+                //    sqlite_cmd.CommandText = string.Format(@"INSERT INTO movie 
+                //        VALUES (null,'{0}','{1}','{2}','{3}','{4}');", row.sourceName, row.fileName, row.location, row.fileTime, DateTime.Now);
+                //    sqlite_cmd.ExecuteNonQuery();
+                //}
+                sqlite_trans.Commit();
+            }
+        }
+
         #endregion
         public void TorrentWatch(string folderPath)
         {
@@ -567,6 +605,9 @@ namespace NoticeRepeatFile
             }
 
         }
+
+ 
+
     }
     public static class EnumerableExtender
     {
