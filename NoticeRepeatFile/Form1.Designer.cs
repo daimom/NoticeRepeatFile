@@ -165,7 +165,7 @@
             this.btnRefresh.Name = "btnRefresh";
             this.btnRefresh.Size = new System.Drawing.Size(75, 23);
             this.btnRefresh.TabIndex = 12;
-            this.btnRefresh.Text = "RefreshDB";
+            this.btnRefresh.Text = "DistinctDB";
             this.btnRefresh.UseVisualStyleBackColor = true;
             this.btnRefresh.Click += new System.EventHandler(this.btnRefresh_Click);
             // 

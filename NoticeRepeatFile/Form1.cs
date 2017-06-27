@@ -216,7 +216,7 @@ namespace NoticeRepeatFile
             //foreach (var a in keyword)
             //{
             //listMsg.Items.Add(a);
-            string a = txtKeyword.Text.Trim();
+            string a = txtKeyword.Text.Replace("-","").Trim();
             var result = searchKeyword(a);
             var count = result.Result.Count();
             if (count > 0)
@@ -277,13 +277,8 @@ namespace NoticeRepeatFile
                                     where fileName in (SELECT distinct filename FROM movie)
                                     group by filename)";
                 sqlite_cmd.ExecuteNonQuery();
-                //foreach (var row in fd)
-                //{
-                //    sqlite_cmd.CommandText = string.Format(@"INSERT INTO movie 
-                //        VALUES (null,'{0}','{1}','{2}','{3}','{4}');", row.sourceName, row.fileName, row.location, row.fileTime, DateTime.Now);
-                //    sqlite_cmd.ExecuteNonQuery();
-                //}
                 sqlite_trans.Commit();
+                MessageBox.Show("刪除完成");
             }
         }
 
