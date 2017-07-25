@@ -82,6 +82,25 @@ namespace NoticeRepeatFile
             }
         }
         /// <summary>
+        /// 監視剪貼簿
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ClipboardTimer_Tick(object sender, EventArgs e)
+        {            
+            if (Clipboard.ContainsText())
+            {
+                string ClipboardText = (String)Clipboard.GetText();
+                if (string.IsNullOrEmpty(ClipboardText) == false &&
+                    string.IsNullOrWhiteSpace(ClipboardText) == false)
+                {
+                    if (ClipboardText.IndexOf("-") >= 0 || ClipboardText.Length > 6)
+                        txtKeyword.Text = ClipboardText;
+                }
+                Clipboard.Clear();
+            }
+        }
+        /// <summary>
         /// 即時監控torrent
         /// </summary>
         /// <param name="sender"></param>
@@ -161,7 +180,13 @@ namespace NoticeRepeatFile
         private void button5_Click(object sender, EventArgs e)
         {
             Properties.Settings.Default.Save();
+            if (chkTimer.Checked == true)
+                ClipboardTimer.Enabled = true;
+            else
+                ClipboardTimer.Enabled = false;
+
         }
+
         private delegate void UpdateFormCallBack();
         private void UpdateForm()
         {
@@ -603,7 +628,6 @@ namespace NoticeRepeatFile
 
         }
 
- 
 
     }
     public static class EnumerableExtender

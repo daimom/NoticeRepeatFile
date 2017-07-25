@@ -43,6 +43,8 @@
             this.txtPath = new System.Windows.Forms.TextBox();
             this.button6 = new System.Windows.Forms.Button();
             this.btnRefresh = new System.Windows.Forms.Button();
+            this.ClipboardTimer = new System.Windows.Forms.Timer(this.components);
+            this.chkTimer = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.dg1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -59,7 +61,7 @@
             // dg1
             // 
             this.dg1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dg1.Location = new System.Drawing.Point(12, 83);
+            this.dg1.Location = new System.Drawing.Point(12, 89);
             this.dg1.Name = "dg1";
             this.dg1.RowTemplate.Height = 24;
             this.dg1.Size = new System.Drawing.Size(622, 215);
@@ -69,7 +71,7 @@
             // 
             // txtMsg
             // 
-            this.txtMsg.Location = new System.Drawing.Point(12, 304);
+            this.txtMsg.Location = new System.Drawing.Point(12, 310);
             this.txtMsg.Multiline = true;
             this.txtMsg.Name = "txtMsg";
             this.txtMsg.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
@@ -169,13 +171,29 @@
             this.btnRefresh.UseVisualStyleBackColor = true;
             this.btnRefresh.Click += new System.EventHandler(this.btnRefresh_Click);
             // 
+            // ClipboardTimer
+            // 
+            this.ClipboardTimer.Interval = 1000;
+            this.ClipboardTimer.Tick += new System.EventHandler(this.ClipboardTimer_Tick);
+            // 
+            // chkTimer
+            // 
+            this.chkTimer.AutoSize = true;
+            this.chkTimer.Location = new System.Drawing.Point(12, 68);
+            this.chkTimer.Name = "chkTimer";
+            this.chkTimer.Size = new System.Drawing.Size(84, 16);
+            this.chkTimer.TabIndex = 13;
+            this.chkTimer.Text = "監視剪貼簿";
+            this.chkTimer.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AcceptButton = this.button2;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.InactiveCaption;
-            this.ClientSize = new System.Drawing.Size(646, 378);
+            this.ClientSize = new System.Drawing.Size(646, 387);
+            this.Controls.Add(this.chkTimer);
             this.Controls.Add(this.btnRefresh);
             this.Controls.Add(this.button6);
             this.Controls.Add(this.button5);
@@ -215,6 +233,8 @@
         private System.Windows.Forms.Button button5;
         private System.Windows.Forms.Button button6;
         private System.Windows.Forms.Button btnRefresh;
+        private System.Windows.Forms.Timer ClipboardTimer;
+        private System.Windows.Forms.CheckBox chkTimer;
     }
 }
 
