@@ -88,16 +88,17 @@ namespace NoticeRepeatFile
         /// <param name="e"></param>
         private void ClipboardTimer_Tick(object sender, EventArgs e)
         {            
-            if (Clipboard.ContainsText())
+            if (Clipboard.ContainsText() || txtKeyword.Text != (String)Clipboard.GetText())
             {
                 string ClipboardText = (String)Clipboard.GetText();
+
                 if (string.IsNullOrEmpty(ClipboardText) == false &&
                     string.IsNullOrWhiteSpace(ClipboardText) == false)
                 {
                     if (ClipboardText.IndexOf("-") >= 0 || ClipboardText.Length > 6)
                         txtKeyword.Text = ClipboardText;
                 }
-                Clipboard.Clear();
+                //Clipboard.Clear();
             }
         }
         /// <summary>
