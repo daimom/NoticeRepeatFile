@@ -596,7 +596,9 @@ namespace NoticeRepeatFile
             int col = e.ColumnIndex;
             if(row>=0 && col >=0)
             {
-                msg(string.Format("value:{0}",dg1.Rows[row].Cells[col].ToString()));
+                //msg(string.Format("value:{0}",dg1.Rows[row].Cells[col].Value));
+                string filePath = Path.GetDirectoryName(dg1.Rows[row].Cells[2].Value.ToString());
+                System.Diagnostics.Process.Start("explorer.exe", filePath);                
             }
 
         }
