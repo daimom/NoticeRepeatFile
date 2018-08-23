@@ -95,7 +95,7 @@ namespace NoticeRepeatFile
                 if (string.IsNullOrEmpty(ClipboardText) == false &&
                     string.IsNullOrWhiteSpace(ClipboardText) == false)
                 {
-                    if (ClipboardText.IndexOf("-") >= 0 || ClipboardText.Length > 6)
+                    if (ClipboardText.IndexOf("-") >= 0 || ClipboardText.Length >= 6)
                         txtKeyword.Text = ClipboardText;
                 }
                 //Clipboard.Clear();
@@ -176,6 +176,16 @@ namespace NoticeRepeatFile
                 listFile.Add(fd);
                 insertData(listFile);
                 msg(string.Format("已插入一筆資料：{0}",fd.fileName));
+                var result = searchKeyword(fd.fileName); //檢查資料庫
+                if (result.Result.Count() > 0)
+                {
+                    notifyIcon1.Visible = true;
+                    notifyIcon1.BalloonTipText = "警告！！有檔案重複。有檔案重複。有檔案重複。有檔案重複。有檔案重複。";
+                    notifyIcon1.BalloonTipTitle = "警告！！";
+                    notifyIcon1.ShowBalloonTip(5000);
+                    UpdateForm();
+                    UpdateUI(listFile);
+                }
             }
         }
         private void button5_Click(object sender, EventArgs e)
@@ -250,9 +260,36 @@ namespace NoticeRepeatFile
                 dg1.DataSource = result.Result.OrderBy(p => p.fileName).ToList();
                 msg(string.Format("查詢：{0}筆",count));
             }
-                
             else
-                msg(string.Format("查無資料--{0}",DateTime.Now.ToString()));
+            {
+                //檢查關鍵字有沒有在種子內
+                List<fileData> listFile = new List<fileData>();
+
+                var folderPath = txtPath.Text;
+                DirectoryInfo di = new DirectoryInfo(folderPath);
+                var fileTime = di.CreationTime; 
+                var torrentResult = getTorrentFile(a, fileTime);   //檢查種子
+                if (torrentResult.Count > 0)
+                {
+                    foreach (var files in torrentResult)
+                    {
+                        listFile.Add(new fileData
+                        {
+                            sourceName = txtPath.Text,
+                            fileName = files
+                        });
+                    }
+                }
+                
+                if (listFile.Count > 0)
+                {
+                    UpdateUI(listFile);
+                    msg(string.Format("查詢：{0}筆", listFile.Count()));
+                }
+                else
+                    msg(string.Format("查無資料--{0}", DateTime.Now.ToString()));
+            }
+                
             //}
             
         }
