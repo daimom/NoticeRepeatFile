@@ -174,8 +174,7 @@ namespace NoticeRepeatFile
                     location = e.FullPath
                 };
                 listFile.Add(fd);
-                insertData(listFile);
-                msg(string.Format("已插入一筆資料：{0}",fd.fileName));
+
                 var result = searchKeyword(fd.fileName); //檢查資料庫
                 if (result.Result.Count() > 0)
                 {
@@ -186,6 +185,11 @@ namespace NoticeRepeatFile
                     UpdateForm();
                     UpdateUI(listFile);
                 }
+
+                insertData(listFile);
+                msg(string.Format("已插入一筆資料：{0}",fd.fileName));
+
+                
             }
         }
         private void button5_Click(object sender, EventArgs e)
@@ -470,8 +474,8 @@ namespace NoticeRepeatFile
             string input = fileName;
             if (input.IndexOf("720p") >= 0 || input.IndexOf("1080p") >= 0)
                 return input;
-            string urlPattern = @"^.+(.net|.com|.cc|.co)[^a-zA-Z0-9]?"; //網址
-            string pattern = @"[a-zA-Z]{2,}-{0,}\d{2,}";
+            string urlPattern = @"^.+(.net|.com|.cc|.co|.tv)[^a-zA-Z0-9]?"; //網址
+            string pattern = @"[a-zA-Z]{2,}-{0,}\d{2,}\w?(.avi|.mp4)";
                 // 先判斷是否有網址?網址取代:繼續
             Regex urlrgx = new Regex(urlPattern, RegexOptions.IgnoreCase);
             MatchCollection urlmatches = urlrgx.Matches(fileName);
@@ -485,9 +489,11 @@ namespace NoticeRepeatFile
             Regex rgx = new Regex(pattern, RegexOptions.IgnoreCase);
             MatchCollection matches = rgx.Matches(input);
             if (matches.Count > 0)
-            {                    
-                foreach (Match match in matches)                    
-                    return match.Value.Replace("-","");                    
+            {
+                string finalStr = "";
+                foreach (Match match in matches)
+                    finalStr = match.Value;
+                return finalStr.Replace("-","").Replace(".avi","").Replace(".mp4","");                    
             }   
             return input;
         }
@@ -642,7 +648,10 @@ namespace NoticeRepeatFile
 
         private void button6_Click(object sender, EventArgs e)
         {
-            testRegex();
+            //testRegex();
+            string keyword = txtKeyword.Text;
+            string testStr = getShortName(keyword);
+            msg(testStr);
         }
 
         private void dg1_RowPostPaint(object sender, DataGridViewRowPostPaintEventArgs e)
@@ -666,7 +675,12 @@ namespace NoticeRepeatFile
 
         }
 
-
+        private void Form1_Activated(object sender, EventArgs e)
+        {
+            txtKeyword.SelectionStart = 0;
+            txtKeyword.SelectionLength = txtKeyword.Text.Length ;
+            txtKeyword.Select();
+        }
     }
     public static class EnumerableExtender
     {

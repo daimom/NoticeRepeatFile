@@ -82,7 +82,7 @@
             // 
             this.button2.Location = new System.Drawing.Point(559, 13);
             this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(75, 23);
+            this.button2.Size = new System.Drawing.Size(75, 49);
             this.button2.TabIndex = 5;
             this.button2.Text = "Search";
             this.button2.UseVisualStyleBackColor = true;
@@ -152,7 +152,7 @@
             // 
             // button6
             // 
-            this.button6.Location = new System.Drawing.Point(478, 68);
+            this.button6.Location = new System.Drawing.Point(478, 64);
             this.button6.Name = "button6";
             this.button6.Size = new System.Drawing.Size(75, 23);
             this.button6.TabIndex = 11;
@@ -163,7 +163,7 @@
             // 
             // btnRefresh
             // 
-            this.btnRefresh.Location = new System.Drawing.Point(560, 39);
+            this.btnRefresh.Location = new System.Drawing.Point(295, 68);
             this.btnRefresh.Name = "btnRefresh";
             this.btnRefresh.Size = new System.Drawing.Size(75, 23);
             this.btnRefresh.TabIndex = 12;
@@ -210,6 +210,7 @@
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "搖桿驅動程式監控";
+            this.Activated += new System.EventHandler(this.Form1_Activated);
             this.Load += new System.EventHandler(this.Form1_Load);
             this.SizeChanged += new System.EventHandler(this.Form1_SizeChanged);
             ((System.ComponentModel.ISupportInitialize)(this.dg1)).EndInit();
