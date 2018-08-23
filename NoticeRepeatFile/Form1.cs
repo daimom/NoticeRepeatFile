@@ -119,7 +119,7 @@ namespace NoticeRepeatFile
                 if (name.IndexOf(".torrent") >= 0)
                     txtKey = name.Replace(".torrent", "");
                 if (name.IndexOf(".") >= 0)
-                    txtKey = name.Replace(".", "");
+                    txtKey = name.Replace(".", "").Replace("-","");
                 var result = searchKeyword(txtKey); //檢查資料庫
                 if (result.Result.Count() > 0)
                 {
