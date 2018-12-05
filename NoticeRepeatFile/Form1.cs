@@ -161,11 +161,11 @@ namespace NoticeRepeatFile
         /// <param name="e"></param>
         private void folder_created(object sender, FileSystemEventArgs e)
         {
-
+            //先排除掉.!ut
             if (filters.Contains(Path.GetExtension(Path.GetFileNameWithoutExtension(e.FullPath))))
             {
                 List<fileData> listFile = new List<fileData>();
-                string fullName = e.Name.Replace(".!ut", "");               ///先排除!ut
+                string fullName = e.Name.Replace(".!ut", "").Replace(".!qB","");               ///先排除!ut
                 fileData fd = new fileData()
                 {
                     sourceName = fullName,
@@ -187,7 +187,7 @@ namespace NoticeRepeatFile
                 }
 
                 insertData(listFile);
-                msg(string.Format("已插入一筆資料：{0}",fd.fileName));
+                UpdateMsg(string.Format("已插入一筆資料：{0}",fd.fileName));
 
                 
             }
@@ -400,8 +400,8 @@ namespace NoticeRepeatFile
             
             foreach(var fi in di.GetFiles("*.torrent",SearchOption.TopDirectoryOnly))
             {
-                var torrentName = fi.Name.ToUpper();
-                if (torrentName.Contains(checkFile.ToUpper()) && fileTime != fi.CreationTime)
+                var torrentName = fi.Name.Replace("-","").ToUpper();
+                if (torrentName.Contains(checkFile.Replace("-", "").ToUpper()) && fileTime != fi.CreationTime)
                     listTorrent.Add(torrentName);
             }
             return listTorrent;
@@ -546,6 +546,21 @@ namespace NoticeRepeatFile
                 sqlite_trans.Commit();
             }
         }
+        private delegate void UpdateMsgCallBack(string message);
+        private void UpdateMsg(string message)
+        {
+            if (this.InvokeRequired)
+            {
+                UpdateMsgCallBack uu = new UpdateMsgCallBack(UpdateMsg);
+                this.Invoke(uu, message);
+            }
+            else
+            {
+                txtMsg.Text += Environment.NewLine + message;
+                txtMsg.SelectionStart = txtMsg.Text.Length;
+                txtMsg.ScrollToCaret();
+            }
+        }
         private void msg(string message)
         {
             txtMsg.Text += Environment.NewLine+ message;
@@ -553,7 +568,11 @@ namespace NoticeRepeatFile
             txtMsg.ScrollToCaret();
         }
        
-
+        /// <summary>
+        /// 檢查db內有沒有資料
+        /// </summary>
+        /// <param name="keyword"></param>
+        /// <returns></returns>
         private async Task<IEnumerable<fileData>> searchKeyword(string keyword)
         {
             keyword = "%" + keyword + "%";

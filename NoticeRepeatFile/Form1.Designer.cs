@@ -61,7 +61,7 @@
             // dg1
             // 
             this.dg1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dg1.Location = new System.Drawing.Point(12, 89);
+            this.dg1.Location = new System.Drawing.Point(12, 97);
             this.dg1.Name = "dg1";
             this.dg1.RowTemplate.Height = 24;
             this.dg1.Size = new System.Drawing.Size(622, 215);
@@ -71,7 +71,7 @@
             // 
             // txtMsg
             // 
-            this.txtMsg.Location = new System.Drawing.Point(12, 310);
+            this.txtMsg.Location = new System.Drawing.Point(12, 320);
             this.txtMsg.Multiline = true;
             this.txtMsg.Name = "txtMsg";
             this.txtMsg.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
