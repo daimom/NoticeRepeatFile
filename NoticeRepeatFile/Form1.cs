@@ -162,6 +162,7 @@ namespace NoticeRepeatFile
         private void folder_created(object sender, FileSystemEventArgs e)
         {
             //先排除掉.!ut
+            //移除特定資料夾檔案
             if (filters.Contains(Path.GetExtension(Path.GetFileNameWithoutExtension(e.FullPath))))
             {
                 List<fileData> listFile = new List<fileData>();
