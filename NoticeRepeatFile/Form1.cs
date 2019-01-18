@@ -112,41 +112,61 @@ namespace NoticeRepeatFile
             var dirInfo = new DirectoryInfo(e.FullPath.ToString());
             var fileName = dirInfo.Name;
             var fileTime = dirInfo.CreationTime;
+            string repeatFile = "";
             string[] keyword = fileName.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
             foreach (var name in keyword)
             {
                 string txtKey = name;
                 if (name.IndexOf(".torrent") >= 0)
-                    txtKey = name.Replace(".torrent", "");
-                if (name.IndexOf(".") >= 0)
-                    txtKey = name.Replace(".", "").Replace("-","");
+                    txtKey = name.Replace(".torrent", "").Replace("-", "");
+                //if (name.IndexOf(".") >= 0)
+                //    txtKey = name.Replace(".", "").Replace("-","");
                 var result = searchKeyword(txtKey); //檢查資料庫
                 if (result.Result.Count() > 0)
                 {
                     var oneFile = result.Result.ToList();
                     listFile.AddRange(oneFile);
+                    repeatFile += txtKey + ",";
                 }
-                var torrentResult = getTorrentFile(txtKey,fileTime);   //檢查種子
+                else
+                {
+                    var resultSource = searchSourceKeyword(txtKey);
+                    if (resultSource.Result.Count() > 0)
+                    {
+                        listFile.Add(new fileData
+                        {
+                            sourceName = "====SourceName====",
+                            fileName = "=====SourceName======="
+                        });
+                        var oneFile = resultSource.Result.ToList();
+                        listFile.AddRange(oneFile);
+                    }
+                }
+                var torrentResult = getTorrentFile(txtKey,fileTime,fileName);   //檢查種子
                 if (torrentResult.Count > 0 )
                 {
-                    foreach(var files in torrentResult)
+                    repeatFile += txtKey + ",";
+                    foreach (var files in torrentResult)
                     {
                         listFile.Add(new fileData
                         {
                             sourceName = txtPath.Text,
                             fileName = files
-                        });
+                        });                        
                     }                                        
                 }
             }
             if(listFile.Count> 0)
-            {                
-                notifyIcon1.Visible = true;
-                notifyIcon1.BalloonTipText = "警告！！有檔案重複。有檔案重複。有檔案重複。有檔案重複。有檔案重複。";
-                notifyIcon1.BalloonTipTitle = "警告！！";
-                notifyIcon1.ShowBalloonTip(5000);                
+            {
+ 
+
+                //notifyIcon1.Visible = true;
+                //notifyIcon1.BalloonTipText = "警告！！有檔案重複。有檔案重複。有檔案重複。有檔案重複。有檔案重複。";
+                //notifyIcon1.BalloonTipTitle = "警告！！";
+                //notifyIcon1.ShowBalloonTip(5000);                
                 UpdateForm();
-                UpdateUI(listFile);                
+                UpdateUI(listFile);
+                UpdateMsg("警告！！種子 " + repeatFile + "  重複！！！ 時間：" + DateTime.Now.ToString());
             }
                 
             
@@ -392,7 +412,7 @@ namespace NoticeRepeatFile
         /// <param name="checkFile">檔案名稱</param>
         /// <param name="fileTime">檔案建立時間</param>
         /// <returns></returns>
-        private List<string> getTorrentFile(string checkFile,DateTime fileTime)
+        private List<string> getTorrentFile(string checkFile,DateTime fileTime,string fileName="")
         {
 
             List<string> listTorrent = new List<string>();
@@ -401,6 +421,8 @@ namespace NoticeRepeatFile
             
             foreach(var fi in di.GetFiles("*.torrent",SearchOption.TopDirectoryOnly))
             {
+                if (fi.Name == fileName)
+                    continue;
                 var torrentName = fi.Name.Replace("-","").ToUpper();
                 if (torrentName.Contains(checkFile.Replace("-", "").ToUpper()) && fileTime != fi.CreationTime)
                     listTorrent.Add(torrentName);
@@ -585,8 +607,19 @@ namespace NoticeRepeatFile
                 return result;
             }
         }
+        private async Task<IEnumerable<fileData>> searchSourceKeyword(string keyword)
+        {
+            keyword = "%" + keyword + "%";
+
+            using (var conn = new SQLiteConnection("Data source = fileLibary.db"))
+            {
+                conn.Open();
+                var result = await conn.QueryAsync<fileData>(@"select * from movie where sourceName like @keyword;", new { keyword });
+                return result;
+            }
+        }
         #region 測試
-        
+
         /// <summary>
         /// 文字檔測試用
         /// </summary>
