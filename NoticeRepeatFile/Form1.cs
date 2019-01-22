@@ -119,6 +119,8 @@ namespace NoticeRepeatFile
                 string txtKey = name;
                 if (name.IndexOf(".torrent") >= 0)
                     txtKey = name.Replace(".torrent", "").Replace("-", "");
+                if (name.IndexOf("-")>=0)
+                    txtKey = name.Replace("-", "");
                 //if (name.IndexOf(".") >= 0)
                 //    txtKey = name.Replace(".", "").Replace("-","");
                 var result = searchKeyword(txtKey); //檢查資料庫
@@ -183,6 +185,8 @@ namespace NoticeRepeatFile
         {
             //先排除掉.!ut
             //移除特定資料夾檔案
+            if (e.FullPath.Contains(".unwanted"))
+                return;
             if (filters.Contains(Path.GetExtension(Path.GetFileNameWithoutExtension(e.FullPath))))
             {
                 List<fileData> listFile = new List<fileData>();
