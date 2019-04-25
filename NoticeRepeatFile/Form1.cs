@@ -176,6 +176,7 @@ namespace NoticeRepeatFile
 
         }
         private string[] filters = new string[] { ".avi", ".mp4" };
+        private string lastFile;
         /// <summary>
         /// 即時監控avi資料夾，新增至資料庫
         /// </summary>
@@ -199,19 +200,24 @@ namespace NoticeRepeatFile
                     location = e.FullPath
                 };
                 listFile.Add(fd);
-
+                
                 var result = searchKeyword(fd.fileName); //檢查資料庫
                 if (result.Result.Count() > 0)
                 {
-                    notifyIcon1.Visible = true;
-                    notifyIcon1.BalloonTipText = "警告！！有檔案重複。有檔案重複。有檔案重複。有檔案重複。有檔案重複。";
-                    notifyIcon1.BalloonTipTitle = "警告！！";
-                    notifyIcon1.ShowBalloonTip(5000);
+                    //notifyIcon1.Visible = true;
+                    //notifyIcon1.BalloonTipText = "警告！！有檔案重複。有檔案重複。有檔案重複。有檔案重複。有檔案重複。";
+                    //notifyIcon1.BalloonTipTitle = "警告！！";
+                    //notifyIcon1.ShowBalloonTip(5000);
                     UpdateForm();
                     UpdateUI(listFile);
+                    UpdateMsg(string.Format("警告！！檔案重複 {0} ，時間：{1}", fd.fileName, DateTime.Now.ToString()));
+                }
+                if(lastFile != fd.fileName)
+                {
+                    lastFile = fd.fileName;
+                    insertData(listFile);
                 }
 
-                insertData(listFile);
                 UpdateMsg(string.Format("已插入一筆資料：{0}",fd.fileName));
 
                 
